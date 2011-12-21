@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:ToolbarBase xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						xmlns:s="library://ns.adobe.com/flex/spark" 
+						xmlns:mx="library://ns.adobe.com/flex/mx" 
+						xmlns:components="itrain.co.uk.components.*"
+						skinClass="itrain.co.uk.skins.StaticToolbarSkin"
+						borderAlpha="0.0"
+						dropShadowVisible="false"
+						backgroundAlpha="0.0">
+	<fx:Script>
+		<![CDATA[
+			import itrain.co.uk.skins.StaticToolbarSkin;
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:HGroup paddingBottom="10"
+			  paddingTop="10"
+			  paddingLeft="20"
+			  paddingRight="20"
+			  focusEnabled="false">
+		<s:HGroup verticalAlign="middle"
+				  focusEnabled="false">
+			<s:DropDownList id="ddFontFamily"/>
+			<s:DropDownList id="ddFontSize"/>
+			<s:Line width="0"
+					height="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xC4CCCC"/>
+				</s:stroke>
+			</s:Line>
+		</s:HGroup>
+		<s:HGroup verticalAlign="middle"
+				  focusEnabled="false">
+			<s:HGroup gap="0">
+				<s:ToggleButton id="btnBold"/>
+				<s:ToggleButton id="btnItalic"/>
+				<s:ToggleButton id="btnUnderline"/>
+			</s:HGroup>
+			<s:Line width="0"
+					height="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xC4CCCC"/>
+				</s:stroke>
+			</s:Line>
+			<mx:ColorPicker id="cpFontColor"/>
+			<s:Line width="0"
+					height="100%">
+				<s:stroke>
+					<s:SolidColorStroke weight="1"
+										color="0xC4CCCC"/>
+				</s:stroke>
+			</s:Line>
+			<s:ButtonBar id="bbAlignment"/>
+			<s:Line width="0"
+					height="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xC4CCCC"/>
+				</s:stroke>
+			</s:Line>
+		</s:HGroup>
+	</s:HGroup>
+</components:ToolbarBase>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 width="100%"
+		 height="100%"
+		 rollOver="onRollOver()"
+		 rollOut="onRollOut()">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.managers.CursorManager;
+			import mx.managers.CursorManagerPriority;
+			import mx.validators.EmailValidator;
+			
+			[Bindable] [Embed(source="assets/icons/move-cursor.png")]
+			private var _moveCursor:Class;
+			
+			private var _crossCursorId:int = -1;
+			
+			private function onRollOver():void {
+				_crossCursorId = CursorManager.setCursor(_moveCursor, CursorManagerPriority.LOW);
+			}
+			
+			private function onRollOut():void {
+				if (_crossCursorId > -1) {
+					CursorManager.removeCursor(_crossCursorId);
+					_crossCursorId = -1;
+				}
+			}
+		]]>
+	</fx:Script>
+	<s:Rect radiusX="10" radiusY="10" width="100%" height="100%">
+		<s:stroke>
+			<s:SolidColorStroke color="0x666666"/>
+		</s:stroke>
+		<s:fill>
+			<s:LinearGradient>
+				<s:GradientEntry color="0xA5A5A5"/>
+				<s:GradientEntry color="0xA5A5A5" alpha=".5"/>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+</s:Group>

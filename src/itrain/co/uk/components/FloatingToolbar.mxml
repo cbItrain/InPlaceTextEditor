@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<local:ToolbarBase xmlns:fx="http://ns.adobe.com/mxml/2009"
+				   xmlns:s="library://ns.adobe.com/flex/spark"
+				   xmlns:mx="library://ns.adobe.com/flex/mx"
+				   xmlns:local="itrain.co.uk.components.*"
+				   preinitialize="onPreInitialize()"
+				   initialize="onInitialize()"
+				   cornerRadius="5"
+				   alpha="0.0"
+				   focusEnabled="false"
+				   dropShadowVisible="false"
+				   filters="{[new DropShadowFilter(6.0, 45, 0x444444, 0.8)]}"
+				   skinClass="itrain.co.uk.skins.FloatingToolbarSkin"
+				   mouseDown="{event.stopImmediatePropagation()}">
+	<fx:Declarations>
+		<s:Fade id="effectIn"
+				alphaFrom="{alpha}"
+				alphaTo="1.0"
+				duration="400"
+				target="{this}"/>
+		<s:Fade id="effectOut"
+				alphaFrom="{alpha}"
+				alphaTo="0.0"
+				duration="400"
+				target="{this}"
+				effectEnd="outEffectEnd()"/>
+		<s:Move id="effectMove"
+				duration="400"
+				target="{this}"
+				easer="{new Power()}"/>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import flash.text.engine.FontPosture;
+			import flash.text.engine.FontWeight;
+
+			import flashx.textLayout.formats.TextAlign;
+			import flashx.textLayout.formats.TextDecoration;
+
+			import itrain.co.uk.events.FloatingToolbarEvent;
+			import itrain.co.uk.renderers.FontLabelItemRenderer;
+			import itrain.co.uk.skins.CustomButtonBarSparkSkin;
+			import itrain.co.uk.skins.CustomDropDownListSkin;
+			import itrain.co.uk.skins.FloatingToolbarSkin;
+
+			import mx.binding.utils.BindingUtils;
+			import mx.binding.utils.ChangeWatcher;
+			import mx.collections.ArrayCollection;
+			import mx.core.FlexGlobals;
+			import mx.core.FontAsset;
+			import mx.core.UIComponent;
+			import mx.events.MoveEvent;
+			import mx.events.PropertyChangeEvent;
+			import mx.managers.PopUpManager;
+			import spark.components.ToggleButton;
+
+			import spark.effects.easing.Power;
+			import spark.filters.DropShadowFilter;
+
+			[Embed(source="assets/icons/pin.png")]
+			private var PIN_ICON:Class;
+
+			private var _isPoppedUp:Boolean=false;
+			private var _parent:DisplayObject;
+			private var _bouandries:Rectangle;
+			private var _offset:Point;
+
+			[Bindable]
+			public var movableParent:DisplayObject;
+
+			[SkinPart]
+			public var btnPin:ToggleButton;
+
+			private function onPreInitialize():void {
+				_fontFamilies.sortOn("fontName");
+
+				_timer.addEventListener(TimerEvent.TIMER_COMPLETE, updatePosition);
+
+				var cStage:DisplayObject=FlexGlobals.topLevelApplication as DisplayObject;
+
+				_bouandries=new Rectangle(0, 0, cStage.width, cStage.height);
+				//trace("boundaries: " + _bouandries.width + " " + _bouandries.height);
+			}
+
+			private function onInitialize():void {
+				if (btnPin) {
+					btnPin.toolTip="Select to pin Menu to the current position";
+					btnPin.setStyle("icon", PIN_ICON);
+					btnPin.addEventListener(Event.CHANGE, onPinClick);
+				}
+			}
+
+			private function onColorPickerOpen(e:Event):void {
+				//trace("lock");
+				dispatchEvent(new FloatingToolbarEvent(FloatingToolbarEvent.LOCK_MENU));
+			}
+
+			private function onColorPickerClose(e:Event):void {
+				//trace("unlock");
+				dispatchEvent(new FloatingToolbarEvent(FloatingToolbarEvent.UNLOCK_MENU));
+			}
+
+			//change functions
+
+			private function onRemoveClick():void {
+				var e:FloatingToolbarEvent=new FloatingToolbarEvent(FloatingToolbarEvent.REMOVE_ITEM);
+				dispatchEvent(e);
+			}
+
+			//-------------------
+
+			private function outEffectEnd():void {
+				PopUpManager.removePopUp(this);
+			}
+
+			public function hide():void {
+				if (_isPoppedUp) {
+					_isPoppedUp=false;
+					if (effectIn.isPlaying)
+						effectIn.pause();
+					effectOut.play();
+				}
+			}
+
+			public function show(parent:UIComponent, offset:Point=null):void {
+				if (!_isPoppedUp) {
+					if (effectOut.isPlaying)
+						effectOut.pause();
+					PopUpManager.addPopUp(this, FlexGlobals.topLevelApplication as DisplayObject);
+					_offset=offset;
+					_parent=parent;
+
+					_isPoppedUp=true;
+
+					var point:Point=getNewCoordinates();
+
+					if (!btnPin.selected) {
+						this.x=point.x;
+						this.y=point.y;
+					}
+
+					onPinClick();
+
+					effectIn.play();
+				}
+			}
+
+			private function onPinClick(e:Event=null):void {
+				unlistenForParentMove();
+				if (!btnPin.selected) {
+					effectMove.xFrom=x;
+					effectMove.yFrom=y;
+
+					var point:Point=getNewCoordinates();
+					effectMove.xTo=point.x;
+					effectMove.yTo=point.y;
+					effectMove.play();
+
+					listenForParentMove();
+				}
+			}
+
+			private function listenForParentMove():void {
+				if (movableParent) {
+					movableParent.addEventListener(MoveEvent.MOVE, onParentMoveEvent);
+				} else {
+					_parent.addEventListener(MoveEvent.MOVE, onParentMoveEvent);
+					_parent.parent.addEventListener(MoveEvent.MOVE, onParentMoveEvent);
+				}
+			}
+
+			private function unlistenForParentMove():void {
+				if (movableParent) {
+					movableParent.removeEventListener(MoveEvent.MOVE, onParentMoveEvent);
+				} else {
+					_parent.parent.removeEventListener(MoveEvent.MOVE, onParentMoveEvent);
+					_parent.removeEventListener(MoveEvent.MOVE, onParentMoveEvent);
+				}
+			}
+
+			private function getNewCoordinates():Point {
+				var tParent:DisplayObject=movableParent != null ? movableParent : _parent;
+				var parentPoint:Point=tParent.localToGlobal(new Point(0, 0));
+				var point:Point=new Point();
+				point.x=parentPoint.x;
+				point.y=parentPoint.y - this.height;
+				if (_offset) {
+					point.x-=_offset.x;
+					point.y-=_offset.y;
+				} else {
+					point.y-=40;
+				}
+
+				if (point.y < _bouandries.y) {
+					point.y=parentPoint.y + tParent.height + 40;
+					if (point.y < _bouandries.y)
+						point.y=_bouandries.x;
+				} else if (point.y + this.height > _bouandries.y + _bouandries.height) {
+					point.y=_bouandries.y + _bouandries.height - this.height;
+				}
+
+				if (point.x < _bouandries.x) {
+					point.x=_bouandries.x;
+				} else if (point.x + this.width > _bouandries.x + _bouandries.width) {
+					point.x=_bouandries.x + _bouandries.width - this.width;
+				}
+				return point;
+			}
+
+			private var _updatePositon:Boolean=false;
+
+			private var _timer:Timer=new Timer(200, 1);
+
+			private function onParentMoveEvent(o:Object=null):void {
+				if (effectMove.isPlaying)
+					effectMove.pause();
+				if (_timer.running)
+					_timer.reset();
+				_timer.start();
+			}
+
+			private function updatePosition(o:Object=null):void {
+				var point:Point=getNewCoordinates();
+				effectMove.xFrom=x;
+				effectMove.yFrom=y;
+				effectMove.xTo=point.x;
+				effectMove.yTo=point.y;
+
+				effectMove.play();
+			}
+		]]>
+	</fx:Script>
+	<s:VGroup focusEnabled="false"
+			  paddingBottom="10"
+			  paddingTop="10"
+			  paddingRight="10">
+		<s:HGroup verticalAlign="middle"
+				  focusEnabled="false">
+			<s:DropDownList id="ddFontFamily"/>
+			<s:DropDownList id="ddFontSize"/>
+			<s:Line width="0"
+					height="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xC4CCCC"/>
+				</s:stroke>
+			</s:Line>
+			<s:Button id="btnRemove"
+					  width="20"
+					  height="20"
+					  focusEnabled="false"
+					  toolTip="Remove Item"
+					  click="onRemoveClick()"
+					  icon="@Embed(source='assets/icons/trash.png')"/>
+		</s:HGroup>
+		<s:HGroup verticalAlign="middle"
+				  focusEnabled="false">
+			<s:HGroup gap="0">
+				<s:ToggleButton id="btnBold"/>
+				<s:ToggleButton id="btnItalic"/>
+				<s:ToggleButton id="btnUnderline"/>
+			</s:HGroup>
+			<s:Line width="0"
+					height="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xC4CCCC"/>
+				</s:stroke>
+			</s:Line>
+			<mx:ColorPicker id="cpFontColor"
+							close="onColorPickerClose(event)"
+							open="onColorPickerOpen(event)"/>
+			<s:Line width="0"
+					height="100%">
+				<s:stroke>
+					<s:SolidColorStroke weight="1"
+										color="0xC4CCCC"/>
+				</s:stroke>
+			</s:Line>
+			<s:ButtonBar id="bbAlignment"/>
+			<s:Line width="0"
+					height="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xC4CCCC"/>
+				</s:stroke>
+			</s:Line>
+		</s:HGroup>
+	</s:VGroup>
+</local:ToolbarBase>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<flexLibProperties includeAllClasses="true" version="3">
+  <includeClasses>
+    <classEntry path="itrain.co.uk.components.InPlaceTextEditor"/>
+    <classEntry path="itrain.co.uk.components.FloatingToolbar"/>
+    <classEntry path="itrain.co.uk.events.FloatingToolbarEvent"/>
+    <classEntry path="itrain.co.uk.renderers.FontLabelItemRenderer"/>
+    <classEntry path="itrain.co.uk.skins.CustomDropDownListSkin"/>
+    <classEntry path="itrain.co.uk.events.InPlaceTextEditorEvent"/>
+    <classEntry path="itrain.co.uk.components.ToolbarBase"/>
+    <classEntry path="itrain.co.uk.components.StaticToolbar"/>
+    <classEntry path="itrain.co.uk.components.DragHandler"/>
+  </includeClasses>
+  <includeResources/>
+  <namespaceManifests/>
+</flexLibProperties>
