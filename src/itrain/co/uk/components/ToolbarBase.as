@@ -48,6 +48,8 @@ package itrain.co.uk.components
 		private static var _italicButtonIcon:Class;
 		[Embed(source="assets/icons/edit-underline.png")]
 		private static var _underlineButtonIcon:Class;
+		[Embed(source="assets/icons/edit-list.png")]
+		private static var _bulletButtonIcon:Class;
 		
 		[Bindable]
 		protected var _fontSizes:Array=[8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72];
@@ -62,6 +64,7 @@ package itrain.co.uk.components
 		public var btnUnderline:ToggleButton;
 		public var cpFontColor:ColorPicker;
 		public var bbAlignment:ButtonBar;
+		public var btnBullets:ToggleButton;
 		
 		
 		public function ToolbarBase()
@@ -85,6 +88,7 @@ package itrain.co.uk.components
 			initializeBtnUnderline();
 			initializeColorPicker();
 			initializeBbAlignment();
+			initializeBtnBullets();
 		}
 		
 		//-------------------Initialization-------------------------------
@@ -141,6 +145,13 @@ package itrain.co.uk.components
 			bbAlignment.focusEnabled = false;
 			bbAlignment.width = 90;
 			bbAlignment.dataProvider = new ArrayCollection([{label:"Left", icon:_alignLeftIcon}, {label:"Center", icon:_alignCenterIcon}, {label:"Right", icon:_alignRightIcon}]);
+		}
+		
+		private function initializeBtnBullets():void {
+			btnBullets.addEventListener(Event.CHANGE, onBulletsChange);
+			btnBullets.setStyle("icon", _bulletButtonIcon);
+			btnBullets.width = btnUnderline.height = 20;
+			btnBullets.focusEnabled = false;
 		}
 		
 		//------------------------------------------------------
@@ -316,5 +327,10 @@ package itrain.co.uk.components
 			dispatchEvent(e);
 		}
 		
+		protected function onBulletsChange(ev:Event = null):void {
+			var e:FloatingToolbarEvent=new FloatingToolbarEvent(FloatingToolbarEvent.BULLETS_CHANGE);
+			e.newValue=btnBullets.selected;
+			dispatchEvent(e);
+		}
 	}
 }

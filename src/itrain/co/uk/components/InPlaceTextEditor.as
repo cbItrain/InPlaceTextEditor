@@ -85,6 +85,7 @@ package itrain.co.uk.components
 				toolBar.addEventListener(FloatingToolbarEvent.FONT_WEIGHT_CHANGE, onFloatingToolbarChange);
 				toolBar.addEventListener(FloatingToolbarEvent.FONT_COLOR_CHANGE, onFloatingToolbarChange);
 				toolBar.addEventListener(FloatingToolbarEvent.TEXT_ALIGNMENT_CHANGE, onFloatingToolbarChange);
+				toolBar.addEventListener(FloatingToolbarEvent.BULLETS_CHANGE, onBulletChange);
 			}
 		}
 		
@@ -112,6 +113,8 @@ package itrain.co.uk.components
 			toolBar.fontColor = tlf.color;
 			toolBar.textAlignment = tlf.textAlign;
 			
+			toolBar.btnBullets.selected = TLFBulletListUtils.containsLists(textFlow);
+			
 			_lastActivePosition = selectionActivePosition;
 			_lastAnchorPosition = selectionAnchorPosition;
 		}
@@ -129,6 +132,11 @@ package itrain.co.uk.components
 			var tlf:TextLayoutFormat = getFormatOfRange();
 			tlf[e.propertyName] = e.newValue;
 			setFormatOfRange(tlf);
+			textChanges();
+		}
+		
+		private function onBulletChange(e:FloatingToolbarEvent):void {
+			TLFBulletListUtils.handleListToggle(textFlow);
 			textChanges();
 		}
 		

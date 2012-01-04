@@ -15,6 +15,7 @@ package itrain.co.uk.events
 		public static const LOCK_MENU:String = "FloatingToolbarEventLockMenu";
 		public static const UNLOCK_MENU:String = "FloatingToolbarEventUnlockMenu";
 		public static const REMOVE_ITEM:String = "FloatingToolbarEventRemoveItem";
+		public static const BULLETS_CHANGE:String = "FloatingToolbarEventBulletsChange";
 		
 		public var newValue:Object;
 		public var propertyName:String;

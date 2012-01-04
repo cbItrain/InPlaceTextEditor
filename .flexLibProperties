@@ -10,6 +10,7 @@
     <classEntry path="itrain.co.uk.components.ToolbarBase"/>
     <classEntry path="itrain.co.uk.components.StaticToolbar"/>
     <classEntry path="itrain.co.uk.components.DragHandler"/>
+    <classEntry path="itrain.co.uk.components.TLFBulletListUtils"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

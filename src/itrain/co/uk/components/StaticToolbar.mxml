@@ -59,6 +59,7 @@
 					<s:SolidColorStroke color="0xC4CCCC"/>
 				</s:stroke>
 			</s:Line>
+			<s:ToggleButton id="btnBullets"/>
 		</s:HGroup>
 	</s:HGroup>
 </components:ToolbarBase>
