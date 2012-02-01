@@ -6,7 +6,9 @@ package itrain.co.uk.components
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.text.engine.Kerning;
+	import flash.ui.ContextMenu;
 	import flash.ui.Keyboard;
+	import flash.utils.getTimer;
 	
 	import flashx.textLayout.edit.EditManager;
 	import flashx.textLayout.edit.IEditManager;
@@ -129,9 +131,16 @@ package itrain.co.uk.components
 		}
 		
 		private function onFloatingToolbarChange(e:FloatingToolbarEvent):void {
-			var tlf:TextLayoutFormat = getFormatOfRange();
+			var tlf:TextLayoutFormat;
+			var anchorPos:int = -1;
+			var activePos:int = -1;
+			if (textFlow.interactionManager.activePosition == textFlow.interactionManager.anchorPosition) {
+				anchorPos = 0;
+				activePos = textFlow.getText().length;
+			}
+			tlf = getFormatOfRange(null, anchorPos, activePos);
 			tlf[e.propertyName] = e.newValue;
-			setFormatOfRange(tlf);
+			setFormatOfRange(tlf,anchorPos, activePos);
 			textChanges();
 		}
 		
