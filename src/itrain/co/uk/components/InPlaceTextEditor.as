@@ -43,17 +43,17 @@ package itrain.co.uk.components
 			
 			_floating = floating;
 			if (_floating) {
-				this.addEventListener(FocusEvent.FOCUS_IN, onFocusIn);
-				this.addEventListener(FocusEvent.FOCUS_OUT, onFocusOut);
-				this.addEventListener(Event.REMOVED, onRemoved);
-				this.addEventListener(MouseEvent.CLICK, onFocusIn);
+				this.addEventListener(FocusEvent.FOCUS_IN, onFocusIn, false, 0, true);
+				this.addEventListener(FocusEvent.FOCUS_OUT, onFocusOut, false, 0, true);
+				this.addEventListener(Event.REMOVED, onRemoved, false, 0, true);
+				this.addEventListener(MouseEvent.CLICK, onFocusIn, false, 0, true);
 				_movableParent = movableParent;
 			}
 			
-			this.addEventListener(FlexEvent.SELECTION_CHANGE, onSelectionChange);
-			this.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
-			this.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-			this.addEventListener(TextOperationEvent.CHANGE, onUserTextChange);
+			this.addEventListener(FlexEvent.SELECTION_CHANGE, onSelectionChange, false, 0, true);
+			this.addEventListener(KeyboardEvent.KEY_UP, onKeyUp, false, 0, true);
+			this.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false, 0, true);
+			this.addEventListener(TextOperationEvent.CHANGE, onUserTextChange, false, 0, true);
 			
 			
 			_lastActivePosition = selectionActivePosition;
@@ -71,23 +71,23 @@ package itrain.co.uk.components
 				if(_floating) {
 					toolBar = new FloatingToolbar();
 					(toolBar as FloatingToolbar).movableParent = _movableParent;
-					toolBar.addEventListener(FloatingToolbarEvent.LOCK_MENU, onLockMenu);
-					toolBar.addEventListener(FloatingToolbarEvent.UNLOCK_MENU, onUnlockMenu);
-					toolBar.addEventListener(FloatingToolbarEvent.REMOVE_ITEM, onRemoveItem);
+					toolBar.addEventListener(FloatingToolbarEvent.LOCK_MENU, onLockMenu, false, 0, true);
+					toolBar.addEventListener(FloatingToolbarEvent.UNLOCK_MENU, onUnlockMenu, false, 0, true);
+					toolBar.addEventListener(FloatingToolbarEvent.REMOVE_ITEM, onRemoveItem, false, 0, true);
 					
-					toolBar.addEventListener(FloatingToolbarEvent.FOCUS_PARENT, revertFocus);
+					toolBar.addEventListener(FloatingToolbarEvent.FOCUS_PARENT, revertFocus, false, 0, true);
 				} else
 					toolBar = new StaticToolbar();
 				toolBar.initialize();
 				
-				toolBar.addEventListener(FloatingToolbarEvent.FONT_FAMILY_CHANGE, onFloatingToolbarChange);
-				toolBar.addEventListener(FloatingToolbarEvent.FONT_SIZE_CHANGE, onFloatingToolbarChange);
-				toolBar.addEventListener(FloatingToolbarEvent.TEXT_DECORATION_CHANGE, onFloatingToolbarChange);
-				toolBar.addEventListener(FloatingToolbarEvent.FONT_STYLE_CHANGE, onFloatingToolbarChange);
-				toolBar.addEventListener(FloatingToolbarEvent.FONT_WEIGHT_CHANGE, onFloatingToolbarChange);
-				toolBar.addEventListener(FloatingToolbarEvent.FONT_COLOR_CHANGE, onFloatingToolbarChange);
-				toolBar.addEventListener(FloatingToolbarEvent.TEXT_ALIGNMENT_CHANGE, onFloatingToolbarChange);
-				toolBar.addEventListener(FloatingToolbarEvent.BULLETS_CHANGE, onBulletChange);
+				toolBar.addEventListener(FloatingToolbarEvent.FONT_FAMILY_CHANGE, onFloatingToolbarChange, false, 0, true);
+				toolBar.addEventListener(FloatingToolbarEvent.FONT_SIZE_CHANGE, onFloatingToolbarChange, false, 0, true);
+				toolBar.addEventListener(FloatingToolbarEvent.TEXT_DECORATION_CHANGE, onFloatingToolbarChange, false, 0, true);
+				toolBar.addEventListener(FloatingToolbarEvent.FONT_STYLE_CHANGE, onFloatingToolbarChange, false, 0, true);
+				toolBar.addEventListener(FloatingToolbarEvent.FONT_WEIGHT_CHANGE, onFloatingToolbarChange, false, 0, true);
+				toolBar.addEventListener(FloatingToolbarEvent.FONT_COLOR_CHANGE, onFloatingToolbarChange, false, 0, true);
+				toolBar.addEventListener(FloatingToolbarEvent.TEXT_ALIGNMENT_CHANGE, onFloatingToolbarChange, false, 0, true);
+				toolBar.addEventListener(FloatingToolbarEvent.BULLETS_CHANGE, onBulletChange, false, 0, true);
 			}
 		}
 		
@@ -161,6 +161,15 @@ package itrain.co.uk.components
 		private function onKeyDown(e:KeyboardEvent):void {
 			if ([Keyboard.UP, Keyboard.DOWN, Keyboard.LEFT, Keyboard.RIGHT].indexOf(e.keyCode) > -1) {
 				e.stopPropagation();
+			} else if (e.keyCode == Keyboard.C && e.ctrlKey) {
+				if (textFlow.interactionManager.activePosition == textFlow.interactionManager.anchorPosition) {
+					e.stopImmediatePropagation();
+					e.preventDefault();
+					var newKE:KeyboardEvent = new KeyboardEvent(KeyboardEvent.KEY_DOWN, true);
+					newKE.keyCode = Keyboard.C;
+					newKE.ctrlKey = true;
+					parent.dispatchEvent(newKE);
+				}
 			}
 		}
 		

@@ -52,7 +52,7 @@ package itrain.co.uk.components
 		private static var _bulletButtonIcon:Class;
 		
 		[Bindable]
-		protected var _fontSizes:Array=[8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72];
+		protected var _fontSizes:Array=[8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 40, 48, 72];
 		
 		[Bindable]
 		protected var _fontFamilies:Array=Font.enumerateFonts(true);
@@ -70,10 +70,10 @@ package itrain.co.uk.components
 		public function ToolbarBase()
 		{
 			super();
-			this.addEventListener(FocusEvent.FOCUS_IN, focusParent);
-			this.addEventListener(FocusEvent.FOCUS_OUT, focusParent);
+			this.addEventListener(FocusEvent.FOCUS_IN, focusParent, false, 0, true);
+			this.addEventListener(FocusEvent.FOCUS_OUT, focusParent, false, 0, true);
 			
-			this.addEventListener(FlexEvent.INITIALIZE, onInitialize);
+			this.addEventListener(FlexEvent.INITIALIZE, onInitialize, false, 0, true);
 			
 			this.focusEnabled = false;
 			
@@ -94,7 +94,7 @@ package itrain.co.uk.components
 		//-------------------Initialization-------------------------------
 		private function initializeFontFamily():void {
 			ddFontFamily.dataProvider = new ArrayCollection(_fontFamilies);
-			ddFontFamily.addEventListener(IndexChangeEvent.CHANGE, onFontFamilyChange);
+			ddFontFamily.addEventListener(IndexChangeEvent.CHANGE, onFontFamilyChange, false, 0, true);
 			ddFontFamily.focusEnabled=false;
 			ddFontFamily.labelField="fontName";
 			ddFontFamily.width = 150;
@@ -106,41 +106,41 @@ package itrain.co.uk.components
 		}
 		
 		private function initializeFontSize():void {
-			ddFontSize.addEventListener(IndexChangeEvent.CHANGE, onFontSizeChange);
+			ddFontSize.addEventListener(IndexChangeEvent.CHANGE, onFontSizeChange, false, 0, true);
 			ddFontSize.dataProvider = new ArrayCollection(_fontSizes);
 			ddFontSize.focusEnabled = false;
 			ddFontSize.width = 60;
 		}
 		
 		private function initializeBtnBold():void {
-			btnBold.addEventListener(Event.CHANGE, onWeightChange);
+			btnBold.addEventListener(Event.CHANGE, onWeightChange, false, 0, true);
 			btnBold.setStyle("icon", _boldButtonIcon);
 			btnBold.width = btnBold.height = 20;
 			btnBold.focusEnabled = false;
 		}
 		
 		private function initializeBtnItalic():void {
-			btnItalic.addEventListener(Event.CHANGE, onFontStyleChange);
+			btnItalic.addEventListener(Event.CHANGE, onFontStyleChange, false, 0, true);
 			btnItalic.setStyle("icon", _italicButtonIcon);
 			btnItalic.width = btnItalic.height = 20;
 			btnItalic.focusEnabled = false;
 		}
 		
 		private function initializeBtnUnderline():void {
-			btnUnderline.addEventListener(Event.CHANGE, onFontDecorationChange);
+			btnUnderline.addEventListener(Event.CHANGE, onFontDecorationChange, false, 0, true);
 			btnUnderline.setStyle("icon", _underlineButtonIcon);
 			btnUnderline.width = btnUnderline.height = 20;
 			btnUnderline.focusEnabled = false;
 		}
 		
 		private function initializeColorPicker():void {
-			cpFontColor.addEventListener(ColorPickerEvent.CHANGE, onFontColorChange);
-			cpFontColor.addEventListener(FocusEvent.FOCUS_OUT, onColorPickerMouseDown);
+			cpFontColor.addEventListener(ColorPickerEvent.CHANGE, onFontColorChange, false, 0, true);
+			cpFontColor.addEventListener(FocusEvent.FOCUS_OUT, onColorPickerMouseDown, false, 0, true);
 			cpFontColor.focusEnabled = false;
 		}
 		
 		private function initializeBbAlignment():void {
-			bbAlignment.addEventListener(IndexChangeEvent.CHANGE, onAlignmentChange);
+			bbAlignment.addEventListener(IndexChangeEvent.CHANGE, onAlignmentChange, false, 0, true);
 			bbAlignment.setStyle("skinClass", CustomButtonBarSparkSkin);
 			bbAlignment.focusEnabled = false;
 			bbAlignment.width = 90;
@@ -148,7 +148,7 @@ package itrain.co.uk.components
 		}
 		
 		private function initializeBtnBullets():void {
-			btnBullets.addEventListener(Event.CHANGE, onBulletsChange);
+			btnBullets.addEventListener(Event.CHANGE, onBulletsChange, false, 0, true);
 			btnBullets.setStyle("icon", _bulletButtonIcon);
 			btnBullets.width = btnUnderline.height = 20;
 			btnBullets.focusEnabled = false;

@@ -52,6 +52,9 @@
 
 			/* exclusions before Flex 4.5 for backwards-compatibility purposes */
 			static private const exclusions_4_0:Array=["background", "titleDisplay", "contentGroup"];
+			
+			[Bindable]
+			private static var pinned:Boolean = false;
 
 			/**
 			 * @private
@@ -284,8 +287,10 @@
 					<s:ToggleButton id="btnPin"
 									width="20"
 									height="20"
+									selected="{pinned}"
 									cornerRadius="5"
 									focusEnabled="false"
+									change="{pinned = btnPin.selected}"
 									left="5"
 									top="5"/>
 				</s:VGroup>

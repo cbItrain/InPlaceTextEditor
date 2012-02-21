@@ -11,7 +11,8 @@
 				   dropShadowVisible="false"
 				   filters="{[new DropShadowFilter(6.0, 45, 0x444444, 0.8)]}"
 				   skinClass="itrain.co.uk.skins.FloatingToolbarSkin"
-				   mouseDown="{event.stopImmediatePropagation()}">
+				   mouseDown="{event.stopImmediatePropagation()}"
+				   move="onMove()">
 	<fx:Declarations>
 		<s:Fade id="effectIn"
 				alphaFrom="{alpha}"
@@ -52,8 +53,8 @@
 			import mx.events.MoveEvent;
 			import mx.events.PropertyChangeEvent;
 			import mx.managers.PopUpManager;
-			import spark.components.ToggleButton;
 
+			import spark.components.ToggleButton;
 			import spark.effects.easing.Power;
 			import spark.filters.DropShadowFilter;
 
@@ -65,16 +66,20 @@
 			private var _bouandries:Rectangle;
 			private var _offset:Point;
 
+			private static var _x:int;
+			private static var _y:int;
+
 			[Bindable]
 			public var movableParent:DisplayObject;
 
 			[SkinPart]
 			public var btnPin:ToggleButton;
 
-			private function onPreInitialize():void {
+			private function onPreInitialize():void
+			{
 				_fontFamilies.sortOn("fontName");
 
-				_timer.addEventListener(TimerEvent.TIMER_COMPLETE, updatePosition);
+				_timer.addEventListener(TimerEvent.TIMER_COMPLETE, updatePosition, false, 0, true);
 
 				var cStage:DisplayObject=FlexGlobals.topLevelApplication as DisplayObject;
 
@@ -82,39 +87,54 @@
 				//trace("boundaries: " + _bouandries.width + " " + _bouandries.height);
 			}
 
-			private function onInitialize():void {
-				if (btnPin) {
+			private function onInitialize():void
+			{
+				if (btnPin)
+				{
 					btnPin.toolTip="Select to pin Menu to the current position";
 					btnPin.setStyle("icon", PIN_ICON);
 					btnPin.addEventListener(Event.CHANGE, onPinClick);
 				}
 			}
+			
+			private function onMove():void {
+				if (btnPin.selected) {
+					_x = x;
+					_y = y;
+				}
+			}
 
-			private function onColorPickerOpen(e:Event):void {
+			private function onColorPickerOpen(e:Event):void
+			{
 				//trace("lock");
 				dispatchEvent(new FloatingToolbarEvent(FloatingToolbarEvent.LOCK_MENU));
 			}
 
-			private function onColorPickerClose(e:Event):void {
+			private function onColorPickerClose(e:Event):void
+			{
 				//trace("unlock");
 				dispatchEvent(new FloatingToolbarEvent(FloatingToolbarEvent.UNLOCK_MENU));
 			}
 
 			//change functions
 
-			private function onRemoveClick():void {
+			private function onRemoveClick():void
+			{
 				var e:FloatingToolbarEvent=new FloatingToolbarEvent(FloatingToolbarEvent.REMOVE_ITEM);
 				dispatchEvent(e);
 			}
 
 			//-------------------
 
-			private function outEffectEnd():void {
+			private function outEffectEnd():void
+			{
 				PopUpManager.removePopUp(this);
 			}
 
-			public function hide():void {
-				if (_isPoppedUp) {
+			public function hide():void
+			{
+				if (_isPoppedUp)
+				{
 					_isPoppedUp=false;
 					if (effectIn.isPlaying)
 						effectIn.pause();
@@ -122,8 +142,10 @@
 				}
 			}
 
-			public function show(parent:UIComponent, offset:Point=null):void {
-				if (!_isPoppedUp) {
+			public function show(parent:UIComponent, offset:Point=null):void
+			{
+				if (!_isPoppedUp)
+				{
 					if (effectOut.isPlaying)
 						effectOut.pause();
 					PopUpManager.addPopUp(this, FlexGlobals.topLevelApplication as DisplayObject);
@@ -132,9 +154,12 @@
 
 					_isPoppedUp=true;
 
-					var point:Point=getNewCoordinates();
-
-					if (!btnPin.selected) {
+					if (btnPin.selected)
+					{
+						this.x = _x;
+						this.y = _y;
+					} else {
+						var point:Point=getNewCoordinates();
 						this.x=point.x;
 						this.y=point.y;
 					}
@@ -145,9 +170,19 @@
 				}
 			}
 
-			private function onPinClick(e:Event=null):void {
+			private function onPinClick(e:Event=null):void
+			{
 				unlistenForParentMove();
-				if (!btnPin.selected) {
+				if (btnPin.selected)
+				{
+					if (_isPoppedUp)
+					{
+						_x=x;
+						_y=y;
+					}
+				}
+				else
+				{
 					effectMove.xFrom=x;
 					effectMove.yFrom=y;
 
@@ -160,48 +195,66 @@
 				}
 			}
 
-			private function listenForParentMove():void {
-				if (movableParent) {
-					movableParent.addEventListener(MoveEvent.MOVE, onParentMoveEvent);
-				} else {
+			private function listenForParentMove():void
+			{
+				if (movableParent)
+				{
+					movableParent.addEventListener(MoveEvent.MOVE, onParentMoveEvent, false, 0, true);
+				}
+				else
+				{
 					_parent.addEventListener(MoveEvent.MOVE, onParentMoveEvent);
-					_parent.parent.addEventListener(MoveEvent.MOVE, onParentMoveEvent);
+					_parent.parent.addEventListener(MoveEvent.MOVE, onParentMoveEvent, false, 0, true);
 				}
 			}
 
-			private function unlistenForParentMove():void {
-				if (movableParent) {
+			private function unlistenForParentMove():void
+			{
+				if (movableParent)
+				{
 					movableParent.removeEventListener(MoveEvent.MOVE, onParentMoveEvent);
-				} else {
+				}
+				else
+				{
 					_parent.parent.removeEventListener(MoveEvent.MOVE, onParentMoveEvent);
 					_parent.removeEventListener(MoveEvent.MOVE, onParentMoveEvent);
 				}
 			}
 
-			private function getNewCoordinates():Point {
+			private function getNewCoordinates():Point
+			{
 				var tParent:DisplayObject=movableParent != null ? movableParent : _parent;
 				var parentPoint:Point=tParent.localToGlobal(new Point(0, 0));
 				var point:Point=new Point();
 				point.x=parentPoint.x;
 				point.y=parentPoint.y - this.height;
-				if (_offset) {
+				if (_offset)
+				{
 					point.x-=_offset.x;
 					point.y-=_offset.y;
-				} else {
+				}
+				else
+				{
 					point.y-=40;
 				}
 
-				if (point.y < _bouandries.y) {
+				if (point.y < _bouandries.y)
+				{
 					point.y=parentPoint.y + tParent.height + 40;
 					if (point.y < _bouandries.y)
 						point.y=_bouandries.x;
-				} else if (point.y + this.height > _bouandries.y + _bouandries.height) {
+				}
+				else if (point.y + this.height > _bouandries.y + _bouandries.height)
+				{
 					point.y=_bouandries.y + _bouandries.height - this.height;
 				}
 
-				if (point.x < _bouandries.x) {
+				if (point.x < _bouandries.x)
+				{
 					point.x=_bouandries.x;
-				} else if (point.x + this.width > _bouandries.x + _bouandries.width) {
+				}
+				else if (point.x + this.width > _bouandries.x + _bouandries.width)
+				{
 					point.x=_bouandries.x + _bouandries.width - this.width;
 				}
 				return point;
@@ -211,7 +264,8 @@
 
 			private var _timer:Timer=new Timer(200, 1);
 
-			private function onParentMoveEvent(o:Object=null):void {
+			private function onParentMoveEvent(o:Object=null):void
+			{
 				if (effectMove.isPlaying)
 					effectMove.pause();
 				if (_timer.running)
@@ -219,7 +273,8 @@
 				_timer.start();
 			}
 
-			private function updatePosition(o:Object=null):void {
+			private function updatePosition(o:Object=null):void
+			{
 				var point:Point=getNewCoordinates();
 				effectMove.xFrom=x;
 				effectMove.yFrom=y;
@@ -282,7 +337,8 @@
 					<s:SolidColorStroke color="0xC4CCCC"/>
 				</s:stroke>
 			</s:Line>
-			<s:ToggleButton id="btnBullets" visible="false"/>
+			<s:ToggleButton id="btnBullets"
+							visible="false"/>
 		</s:HGroup>
 	</s:VGroup>
 </local:ToolbarBase>
