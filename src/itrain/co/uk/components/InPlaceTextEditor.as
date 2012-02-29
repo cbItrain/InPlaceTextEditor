@@ -36,6 +36,7 @@ package itrain.co.uk.components
 		private var _lastActivePosition:int;
 		private var _lastAnchorPosition:int;
 		private var _movableParent:DisplayObject;
+		private var _isFocused:Boolean = false;
 		
 		public function InPlaceTextEditor(floating:Boolean = false, movableParent:DisplayObject = null)
 		{
@@ -55,6 +56,8 @@ package itrain.co.uk.components
 			this.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false, 0, true);
 			this.addEventListener(TextOperationEvent.CHANGE, onUserTextChange, false, 0, true);
 			
+			this.addEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
+			
 			
 			_lastActivePosition = selectionActivePosition;
 			_lastAnchorPosition = selectionAnchorPosition;
@@ -63,6 +66,10 @@ package itrain.co.uk.components
 			
 			this.setStyle("	focusSkin", null);
 			this.setStyle("focusThickness", 0);
+		}
+		
+		public function isFocused():Boolean {
+			return _isFocused;
 		}
 		
 		override protected function createChildren():void {
@@ -74,7 +81,6 @@ package itrain.co.uk.components
 					toolBar.addEventListener(FloatingToolbarEvent.LOCK_MENU, onLockMenu, false, 0, true);
 					toolBar.addEventListener(FloatingToolbarEvent.UNLOCK_MENU, onUnlockMenu, false, 0, true);
 					toolBar.addEventListener(FloatingToolbarEvent.REMOVE_ITEM, onRemoveItem, false, 0, true);
-					
 					toolBar.addEventListener(FloatingToolbarEvent.FOCUS_PARENT, revertFocus, false, 0, true);
 				} else
 					toolBar = new StaticToolbar();
@@ -89,6 +95,31 @@ package itrain.co.uk.components
 				toolBar.addEventListener(FloatingToolbarEvent.TEXT_ALIGNMENT_CHANGE, onFloatingToolbarChange, false, 0, true);
 				toolBar.addEventListener(FloatingToolbarEvent.BULLETS_CHANGE, onBulletChange, false, 0, true);
 			}
+		}
+		
+		private function onRemovedFromStage(e:Event):void {
+			this.removeEventListener(FocusEvent.FOCUS_IN, onFocusIn);
+			this.removeEventListener(FocusEvent.FOCUS_OUT, onFocusOut);
+			this.removeEventListener(Event.REMOVED, onRemoved);
+			this.removeEventListener(MouseEvent.CLICK, onFocusIn);
+			this.removeEventListener(FlexEvent.SELECTION_CHANGE, onSelectionChange);
+			this.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+			this.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+			this.removeEventListener(TextOperationEvent.CHANGE, onUserTextChange);
+			this.removeEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
+			
+			toolBar.removeEventListener(FloatingToolbarEvent.LOCK_MENU, onLockMenu);
+			toolBar.removeEventListener(FloatingToolbarEvent.UNLOCK_MENU, onUnlockMenu);
+			toolBar.removeEventListener(FloatingToolbarEvent.REMOVE_ITEM, onRemoveItem);
+			toolBar.removeEventListener(FloatingToolbarEvent.FOCUS_PARENT, revertFocus);
+			toolBar.removeEventListener(FloatingToolbarEvent.FONT_FAMILY_CHANGE, onFloatingToolbarChange);
+			toolBar.removeEventListener(FloatingToolbarEvent.FONT_SIZE_CHANGE, onFloatingToolbarChange);
+			toolBar.removeEventListener(FloatingToolbarEvent.TEXT_DECORATION_CHANGE, onFloatingToolbarChange);
+			toolBar.removeEventListener(FloatingToolbarEvent.FONT_STYLE_CHANGE, onFloatingToolbarChange);
+			toolBar.removeEventListener(FloatingToolbarEvent.FONT_WEIGHT_CHANGE, onFloatingToolbarChange);
+			toolBar.removeEventListener(FloatingToolbarEvent.FONT_COLOR_CHANGE, onFloatingToolbarChange);
+			toolBar.removeEventListener(FloatingToolbarEvent.TEXT_ALIGNMENT_CHANGE, onFloatingToolbarChange);
+			toolBar.removeEventListener(FloatingToolbarEvent.BULLETS_CHANGE, onBulletChange);
 		}
 		
 		private function revertFocus(e:Event):void {
@@ -122,10 +153,12 @@ package itrain.co.uk.components
 		}
 		
 		private function onFocusIn(e:Event):void {
+			_isFocused=true;
 			(toolBar as FloatingToolbar).show(this);
 		}
 		
 		private function onFocusOut(e:FocusEvent):void {
+			_isFocused=false;
 			if (!_lockedMenu)
 				(toolBar as FloatingToolbar).hide();
 		}
